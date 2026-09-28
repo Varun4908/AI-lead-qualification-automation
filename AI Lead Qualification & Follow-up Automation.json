@@ -1,0 +1,304 @@
+{
+  "name": "AI Lead Qualification & Follow-up Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Welcome",
+        "formDescription": "What are you looking for?",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "What is your name?",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Email",
+              "fieldType": "email"
+            },
+            {
+              "fieldLabel": "Mobile number",
+              "fieldType": "number",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Company name"
+            },
+            {
+              "fieldLabel": "Requirement",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Budget"
+            },
+            {
+              "fieldLabel": "Timeline"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        0,
+        0
+      ],
+      "id": "62664d6f-2179-4e02-a20f-af1de1aee08b",
+      "name": "On form submission",
+      "webhookId": "d9f2f4a9-6e2c-49bb-a6b4-8612d2219963"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        176,
+        240
+      ],
+      "id": "8c74b4d0-56e4-4218-ac77-423ab5a0f4d4",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "LzrxVNAzUoHjn9yw",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an AI Sales Qualification Assistant.\n\nYour job is to analyze a new business lead submitted through a lead generation form and provide a clear sales assessment.\n\nHere is the lead information:\n\nName: {{ $json[\"What is your name?\"] }}\nEmail: {{ $json[\"Email\"] }}\nMobile Number: {{ $json[\"Mobile number\"] }}\nCompany: {{ $json[\"Company name\"] }}\nRequirement: {{ $json[\"Requirement\"] }}\nBudget: {{ $json[\"Budget\"] }}\nTimeline: {{ $json[\"Timeline\"] }}\n\nAnalyze this lead and provide the following:\n\n1. Lead Priority:\nClassify the lead as High, Medium, or Low.\n\n2. Buying Intent:\nClassify the buying intent as High, Medium, or Low.\n\n3. Lead Summary:\nGive a short summary of what the customer wants.\n\n4. Key Information:\nMention the customer's company, requirement, budget, and timeline.\n\n5. Recommended Action:\nExplain what the sales team should do next and how quickly they should follow up.\n\n6. Personalized Follow-up Message:\nWrite a short, professional WhatsApp/email-style message that the sales representative can send to this customer.\n\nKeep the response concise, professional, and practical.\n\nDo not invent information that is not provided in the form.",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "1d74edfc-58a9-40c8-9c2d-fab6c232e3b7",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1jYWxFymVyS5HJfgSIy9bm9v-QU5Dq8WsQ_EPoHpuQzs",
+          "mode": "list",
+          "cachedResultName": "AI lead management",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jYWxFymVyS5HJfgSIy9bm9v-QU5Dq8WsQ_EPoHpuQzs/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jYWxFymVyS5HJfgSIy9bm9v-QU5Dq8WsQ_EPoHpuQzs/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $('On form submission').item.json[\"What is your name?\"] }}",
+            "Email": "={{ $('On form submission').item.json[\"Email\"] }}",
+            "Mobile": "={{ $('On form submission').item.json[\"Mobile number\"] }}",
+            "Company": "={{ $('On form submission').item.json[\"Company name\"] }}",
+            "Requirement": "={{ $('On form submission').item.json[\"Requirement\"] }}",
+            "Budget": "={{ $('On form submission').item.json[\"Budget\"] }}",
+            "Timeline": "={{ $('On form submission').item.json[\"Timeline\"] }}",
+            "Lead Priority": "={{ typeof $json.output === 'string' ? JSON.parse($json.output).lead_priority : $json.output.lead_priority }}",
+            "Buying Intent": "={{ typeof $json.output === 'string' ? JSON.parse($json.output).buying_intent : $json.output.buying_intent }}",
+            "AI Analysis": "={{ $json.output }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Mobile",
+              "displayName": "Mobile",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Requirement",
+              "displayName": "Requirement",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Budget",
+              "displayName": "Budget",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Timeline",
+              "displayName": "Timeline",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Lead Priority",
+              "displayName": "Lead Priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Buying Intent",
+              "displayName": "Buying Intent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "AI Analysis",
+              "displayName": "AI Analysis",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        592,
+        0
+      ],
+      "id": "e29f4b40-7c0f-4381-9ad9-cf3a2cbe166d",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "U2SM0wouD6JfLcPE",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"lead_priority\": \"Low\",\n  \"buying_intent\": \"Low\",\n  \"lead_summary\": \"Customer is interested in jeans but has not provided company, budget, quantity, or timeline.\",\n  \"recommended_action\": \"Ask whether the requirement is for wholesale or personal use and clarify quantity and budget.\",\n  \"follow_up_message\": \"Hi Arun, thank you for your interest in our jeans collection. Could you please share whether you are looking for a wholesale order or personal use, along with the quantity and budget you have in mind?\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        400,
+        208
+      ],
+      "id": "ce690607-4540-4b31-b6da-9050290bffec",
+      "name": "Structured Output Parser"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "3a77d3b7-c5b6-4a07-88dd-2193b581c330",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8b611b76887723854e55633d91f2b17fae24261384306d8b800427ba67bc4053"
+  },
+  "nodeGroups": [],
+  "id": "byGoda5VS31eKkxL",
+  "tags": []
+}
